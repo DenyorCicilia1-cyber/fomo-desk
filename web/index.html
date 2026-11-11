@@ -6,28 +6,131 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="FOMO Desk">
-  <meta name="theme-color" content="#0b0f14">
+  <meta name="theme-color" content="#000000">
   <title>FOMO Desk</title>
-  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-180.png">
   <link rel="icon" href="icon-192.png">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="app.css">
 </head>
 <body>
-  <header>
-    <h1>FOMO Desk</h1>
-    <span id="mode-badge" class="badge">PAPER</span>
-  </header>
-  <main>
-    <section class="balance-card">
-      <div class="label">Balance</div>
-      <div id="balance" class="balance">—</div>
-      <div id="caption" class="caption"></div>
-      <div id="updated" class="updated"></div>
-      <div id="status" class="status"></div>
+  <div id="offline-banner" class="offline-banner" hidden></div>
+
+  <div id="view-home" class="view view-home">
+    <header class="navbar">
+      <button type="button" class="avatar" id="btn-avatar" aria-label="Account">G</button>
+      <div class="nav-title">Grok Bot <span class="chev">›</span></div>
+      <button type="button" class="icon-btn" id="btn-search" aria-label="Search">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="6.5" stroke="currentColor" stroke-width="1.7"/><path d="M15 15l4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </button>
+      <button type="button" class="icon-btn" id="btn-bell" aria-label="Notifications">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><path d="M11 3.5a5.5 5.5 0 00-5.5 5.5v3.2L4 14.5h14l-1.5-2.3V9A5.5 5.5 0 0011 3.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 16.5a2 2 0 004 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <span id="bell-dot" class="bell-dot" hidden></span>
+      </button>
+    </header>
+    <div class="balance-row">
+      <div id="odometer" class="odometer" aria-label="Balance">—</div>
+      <span id="paper-badge" class="paper-badge" hidden>PAPER</span>
+    </div>
+    <div class="balance-meta">
+      <span id="today-pct" class="today-pct">+0.00%</span>
+      <span id="multiplier" class="multiplier-pill">1.00×</span>
+    </div>
+    <p id="paper-label" class="paper-label" hidden></p>
+    <div class="chart-wrap">
+      <canvas id="home-chart"></canvas>
+      <div id="chart-empty" class="chart-empty" hidden>Waiting for the first trade</div>
+    </div>
+    <div class="range-switch" id="range-switch" role="tablist">
+      <button type="button" data-range="LIVE" class="on">LIVE</button>
+      <button type="button" data-range="1H">1H</button>
+      <button type="button" data-range="4H">4H</button>
+      <button type="button" data-range="1D">1D</button>
+      <button type="button" data-range="1W">1W</button>
+      <button type="button" data-range="ALL">ALL</button>
+    </div>
+    <section class="section">
+      <div class="section-head">
+        <h2>Agents · <span id="agents-running">5 running</span></h2>
+      </div>
+      <div class="agent-carousel" id="agent-carousel"></div>
     </section>
-  </main>
+    <section class="section">
+      <div class="section-head">
+        <h2>Activity</h2>
+        <button type="button" class="see-all" id="btn-see-all">See all</button>
+      </div>
+      <div id="home-activity" class="activity-list"></div>
+    </section>
+  </div>
+
+  <div id="view-agents" class="view" hidden>
+    <header class="navbar page-nav">
+      <h1>Agents</h1>
+    </header>
+    <div id="agents-list" class="agents-list"></div>
+  </div>
+
+  <div id="view-activity" class="view" hidden>
+    <header class="navbar page-nav">
+      <h1>Activity</h1>
+    </header>
+    <div id="activity-list" class="activity-list padded"></div>
+  </div>
+
+  <div id="view-account" class="view" hidden>
+    <header class="navbar page-nav">
+      <h1>Account</h1>
+    </header>
+    <div id="account-body" class="account-body"></div>
+  </div>
+
+  <div id="view-coin" class="view" hidden>
+    <header class="navbar">
+      <button type="button" class="back-btn" data-back aria-label="Back">‹</button>
+      <div class="coin-head">
+        <div id="coin-title" class="nav-title">Coin</div>
+        <div id="coin-sub" class="nav-sub"></div>
+      </div>
+      <span id="coin-badge" class="paper-badge" hidden>PAPER</span>
+      <span id="coin-shield" class="shield" hidden></span>
+    </header>
+    <div id="coin-body" class="coin-body"></div>
+  </div>
+
+  <div id="view-auditor" class="view" hidden>
+    <header class="navbar">
+      <button type="button" class="back-btn" data-back aria-label="Back">‹</button>
+      <h1 id="audit-title">Auditor</h1>
+    </header>
+    <div id="audit-body" class="audit-body"></div>
+  </div>
+
+  <div id="search-sheet" class="search-sheet" hidden>
+    <div class="search-bar">
+      <input id="search-input" type="search" placeholder="Name, symbol or mint" autocomplete="off">
+      <button type="button" id="search-close">Cancel</button>
+    </div>
+    <div id="search-results" class="search-results"></div>
+  </div>
+
+  <nav class="tabbar" aria-label="Main">
+    <button type="button" class="tab on" data-tab="home">
+      <span class="tab-ic">⌂</span><span>Home</span>
+    </button>
+    <button type="button" class="tab" data-tab="agents">
+      <span class="tab-ic">▣</span><span>Agents</span>
+    </button>
+    <button type="button" class="tab" data-tab="activity">
+      <span class="tab-ic">≡</span><span>Activity</span>
+    </button>
+    <button type="button" class="tab" data-tab="account">
+      <span class="tab-ic">●</span><span>Account</span>
+    </button>
+  </nav>
+
   <script src="config.js"></script>
+  <script src="chart.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
