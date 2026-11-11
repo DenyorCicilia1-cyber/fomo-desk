@@ -103,7 +103,10 @@
     }
   }
 
+  let started = false;
+
   async function start() {
+    if (started) return;
     const token = readToken();
     if (!token) {
       setStatus("Open the private link from Telegram to unlock.", "err");
@@ -115,9 +118,14 @@
       setStatus("Could not unlock this device.", "err");
       return;
     }
+    started = true;
     await poll();
     setInterval(poll, POLL_MS);
   }
 
+  // Pasting the private link into an already-open tab only changes the hash,
+  // which doesn't reload the page, so pick the key up here too.
+  window.addEventListener("hashchange", start);
+  window.addEventListener("pageshow", start);
   start();
 })();
