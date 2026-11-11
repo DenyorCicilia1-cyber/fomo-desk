@@ -84,7 +84,10 @@ button { background: none; border: 0; padding: 0; cursor: pointer; }
   display: inline-block; height: 1em; overflow: hidden; vertical-align: top;
   width: 0.62em; position: relative;
 }
-.odometer .digit-col.sym, .odometer .digit-col.dot { width: auto; overflow: visible; }
+.odometer .digit-col.sym, .odometer .digit-col.dot {
+  width: auto; overflow: visible;
+  background: transparent; border-radius: 0; height: 1em;
+}
 .odometer .strip {
   display: flex; flex-direction: column; transition: transform 600ms ease-out;
 }
