@@ -315,10 +315,12 @@
       const sub = escapeHtml(r.subtitle || "");
       const val = escapeHtml(r.value || "");
       const kind = r.kind || "";
+      const isTest = !!(r.test || /\btest\b/i.test((r.title || "") + " " + (r.subtitle || "")));
+      const badge = isTest ? ' <span class="act-test">TEST</span>' : "";
       let dest = "";
       if ((kind === "bought" || kind === "sold" || kind === "stopped") && r.mint) dest = "coin:" + r.mint;
       else if (kind === "rejected" && r.mint) dest = "audit:" + r.mint;
-      return '<button type="button" class="act-row" data-go="' + escapeHtml(dest) + '"><div class="act-main"><div class="act-title">' + title + '</div><div class="act-sub">' + sub + '</div></div><div class="act-value">' + val + "</div></button>";
+      return '<button type="button" class="act-row" data-go="' + escapeHtml(dest) + '"><div class="act-main"><div class="act-title">' + title + badge + '</div><div class="act-sub">' + sub + '</div></div><div class="act-value">' + val + "</div></button>";
     }).join("");
   }
 
@@ -444,7 +446,8 @@
     const holders = stats.holders == null || stats.holders === "" ? "n/a" : String(stats.holders);
     let posHtml = "";
     if (c.position) {
-      posHtml += '<div class="pos-card"><h3>Your position · ' + escapeHtml(usd(c.position.size_usd)) + " in · Executor</h3></div>";
+      const testTag = c.position.test ? ' <span class="pos-test">TEST</span>' : "";
+      posHtml += '<div class="pos-card"><h3>Your position · ' + escapeHtml(usd(c.position.size_usd)) + " in · Executor" + testTag + "</h3></div>";
       posHtml += '<div class="exit-card"><h3>Exit</h3><div>Stop line ' + escapeHtml(usd(c.position.stop, 6)) + "</div>";
       if (c.position.trail != null) posHtml += "<div>Trail line " + escapeHtml(usd(c.position.trail, 6)) + "</div>";
       if (c.position.timeout_left) posHtml += "<div>Time left " + escapeHtml(c.position.timeout_left) + "</div></div>";
