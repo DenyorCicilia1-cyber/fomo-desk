@@ -252,6 +252,7 @@ button { background: none; border: 0; padding: 0; cursor: pointer; }
 .setting-line { display: flex; flex-direction: column; gap: 6px; padding: 10px var(--gutter); border-bottom: 0.5px solid var(--sep); }
 .setting-line .sl { display: flex; justify-content: space-between; font-size: 15px; }
 .setting-line input[type="range"] { width: 100%; accent-color: var(--blue); opacity: 0.55; }
+.range-hint { color: var(--sec); font-size: 12px; }
 .setting-line input[type="text"], .setting-line input[type="number"] {
   width: 88px; background: var(--card2); border: 0; border-radius: 8px;
   padding: 6px 8px; text-align: right; opacity: 0.7;

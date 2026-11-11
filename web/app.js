@@ -383,6 +383,7 @@
         else html += "<span class='v'>" + escapeHtml(val) + "</span>";
         html += "</div>";
         if (isNum && it.min != null && it.max != null) {
+          html += '<div class="range-hint">' + it.min + ' – ' + it.max + '</div>';
           html += '<input type="range" min="' + it.min + '" max="' + it.max + '" step="' + (it.step || "any") + '" value="' + escapeHtml(val) + '" disabled>';
         }
         html += "</div>";
