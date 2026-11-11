@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FOMO Desk">
+  <meta name="theme-color" content="#0b0f14">
+  <title>FOMO Desk</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <link rel="icon" href="icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>FOMO Desk</h1>
+    <span id="mode-badge" class="badge">PAPER</span>
+  </header>
+  <main>
+    <section class="balance-card">
+      <div class="label">Balance</div>
+      <div id="balance" class="balance">—</div>
+      <div id="caption" class="caption"></div>
+      <div id="updated" class="updated"></div>
+      <div id="status" class="status"></div>
+    </section>
+  </main>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
