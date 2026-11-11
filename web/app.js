@@ -84,7 +84,16 @@
   function usd(n, d) {
     const v = Number(n);
     if (!Number.isFinite(v)) return "—";
-    return v.toLocaleString(undefined, { style: "currency", currency: "USD", minimumFractionDigits: d == null ? 2 : d });
+    const digits = d == null ? 2 : d;
+    return v.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: digits, maximumFractionDigits: digits });
+  }
+  function tokenPrice(n) {
+    const v = Number(n);
+    if (!Number.isFinite(v) || v <= 0) return "—";
+    if (v >= 1) return usd(v, 2);
+    if (v >= 0.01) return usd(v, 4);
+    const dec = Math.min(12, Math.max(6, -Math.floor(Math.log10(v)) + 4));
+    return usd(v, dec);
   }
   function fmtPct(n, signed) {
     const v = Number(n);
@@ -102,35 +111,41 @@
   /* -------- odometer -------- */
   function renderOdometer(el, value) {
     const text = usd(value);
+    el.setAttribute("aria-label", "Balance " + text);
     if (reduced) { el.textContent = text; return; }
     const chars = text.split("");
-    if (!el.dataset.ready) {
+    const prev = el.dataset.prev || "";
+    const first = !el.dataset.ready;
+    if (first || prev.length !== text.length) {
       el.innerHTML = chars.map((ch) => colHtml(ch)).join("");
       el.dataset.ready = "1";
-      el.dataset.prev = text;
-      return;
     }
-    const prev = el.dataset.prev || "";
-    if (prev === text) return;
-    // rebuild if length changed
-    if (prev.length !== text.length) {
-      el.innerHTML = chars.map((ch) => colHtml(ch)).join("");
+    function apply(animate) {
+      const cols = el.querySelectorAll(".digit-col");
+      chars.forEach((ch, i) => {
+        const col = cols[i];
+        if (!col) return;
+        if (!/[0-9]/.test(ch)) {
+          col.className = "digit-col " + (ch === "." ? "dot" : "sym");
+          col.innerHTML = escapeHtml(ch);
+          return;
+        }
+        let strip = col.querySelector(".strip");
+        if (!strip) { col.innerHTML = digitStrip(); strip = col.querySelector(".strip"); }
+        const delay = animate ? (chars.length - 1 - i) * 30 : 0;
+        strip.style.transition = animate ? "transform 600ms ease-out" : "none";
+        strip.style.transitionDelay = delay + "ms";
+        strip.style.transform = "translateY(" + (-parseInt(ch, 10)) + "em)";
+      });
     }
-    const cols = el.querySelectorAll(".digit-col");
-    chars.forEach((ch, i) => {
-      const col = cols[i];
-      if (!col) return;
-      if (!/[0-9]/.test(ch)) {
-        col.className = "digit-col " + (ch === "." ? "dot" : "sym");
-        col.innerHTML = ch;
-        return;
-      }
-      let strip = col.querySelector(".strip");
-      if (!strip) { col.innerHTML = digitStrip(); strip = col.querySelector(".strip"); }
-      const delay = (chars.length - 1 - i) * 30;
-      strip.style.transitionDelay = delay + "ms";
-      strip.style.transform = "translateY(" + (-parseInt(ch, 10) * 1) + "em)";
-    });
+    if (first) {
+      apply(false);
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { apply(true); });
+      });
+    } else if (prev !== text) {
+      apply(true);
+    }
     el.dataset.prev = text;
   }
   function colHtml(ch) {
@@ -437,7 +452,7 @@
     const btnLabel = c.button || (c.position ? "Sell on FOMO" : "Buy on FOMO");
     const link = c.coin_url || "";
     $("coin-body").innerHTML =
-      '<div class="price-big">' + escapeHtml(usd(c.price, 6)) + '</div>' +
+      '<div class="price-big">' + escapeHtml(tokenPrice(c.price)) + '</div>' +
       (chgTxt ? '<div class="chg ' + chgCls + '">' + escapeHtml(chgTxt) + "</div>" : "") +
       '<div class="candle-wrap"><canvas id="coin-chart"></canvas></div>' +
       '<div class="stats">' +
@@ -589,6 +604,10 @@
     const when = lastUpdate ? new Date(lastUpdate).toLocaleTimeString() : "—";
     b.hidden = false;
     b.textContent = "Desk offline · retrying in " + seconds + "s · last update " + when;
+    if (!lastState) {
+      const ar = $("agents-running");
+      if (ar) ar.textContent = "—";
+    }
   }
 
   async function poll() {

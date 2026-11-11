@@ -216,6 +216,7 @@ button { background: none; border: 0; padding: 0; cursor: pointer; }
 .switch {
   width: 51px; height: 31px; border-radius: 16px;
   background: var(--card2); position: relative; flex-shrink: 0; opacity: 0.45;
+  pointer-events: none; cursor: default;
 }
 .switch.on { background: var(--green); opacity: 0.7; }
 .switch i {
@@ -276,8 +277,9 @@ button { background: none; border: 0; padding: 0; cursor: pointer; }
 .fomo-btn {
   display: flex; align-items: center; justify-content: center;
   width: 100%; margin: 16px 0 8px;
+  min-height: 44px; padding: 12px 16px;
   background: var(--blue); color: #fff; font-size: 17px; font-weight: 600;
-  border-radius: 14px;
+  border-radius: 14px; text-decoration: none;
 }
 .candle-wrap { height: 220px; margin: 8px 0 4px; }
 
